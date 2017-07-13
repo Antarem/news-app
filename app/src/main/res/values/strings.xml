@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">NewsApp</string>
+    <string name="placeholder_title">Lies, damned lies and statistics</string>
+    <string name="placeholder_released">HH:MM:SS, YYYY-MM-DD</string>
+    <string name="placeholder_author">By Someone Certainly</string>
+    <string name="placeholder_section">Fropperies</string>
+    <string name="no_news">No news, good news!</string>
+    <string name="no_internet">No internet, bad news!</string>
+    <string name="settings_menu_item">Settings</string>
+
+    <string name="settings_title">News Settings</string>
+    <!-- Strings For Minimum Magnitude Preference [CHAR LIMIT=30] -->
+    <string name="settings_section_label">Section</string>
+    <string name="settings_section_key" translatable="false">section</string>
+    <string name="settings_section_default" translatable="false">@string/settings_section_technology_value</string>
+    
+    <string name="settings_section_artanddesign_label">Art and design</string>
+    <string name="settings_section_artanddesign_value">artanddesign</string>
+
+    <string name="settings_section_australianews_label">Australia news</string>
+    <string name="settings_section_australianews_value">australia-news</string>
+
+    <string name="settings_section_betterbusiness_label">Better business</string>
+    <string name="settings_section_betterbusiness_value">better-business</string>
+
+    <string name="settings_section_books_label">Books</string>
+    <string name="settings_section_books_value">books</string>
+
+    <string name="settings_section_technology_label">Technology</string>
+    <string name="settings_section_technology_value">technology</string>
+
+</resources>
