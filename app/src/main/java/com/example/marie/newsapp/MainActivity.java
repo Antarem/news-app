@@ -113,4 +113,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ListView news_stand = (ListView) findViewById(R.id.news_list);
+        frontend.clear();
+        TextView too_bad = (TextView) findViewById(R.id.empty_list_text);
+
+        ConnectivityManager connMag = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ntwInfo = connMag.getActiveNetworkInfo();
+        if(ntwInfo != null && ntwInfo.isConnected()) {
+            getLoaderManager().restartLoader(1, null, this);
+        }
+        else {
+            findViewById(R.id.ouboros).setVisibility(View.GONE);
+            too_bad.setText(R.string.no_internet);
+        }
+
+        news_stand.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // Find the current earthquake that was clicked on
+                Article currentEarthquake = frontend.getItem(position);
+
+                // Convert the String URL into a URI object (to pass into the Intent constructor)
+                Uri earthquakeUri = Uri.parse(currentEarthquake.get_url());
+
+                // Create a new intent to view the earthquake URI
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
+
+                // Send the intent to launch a new activity
+                startActivity(websiteIntent);
+            }
+        });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle of_sticks) {
+        super.onSaveInstanceState(of_sticks);
+    }
+
 }
