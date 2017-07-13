@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     final private static String LOG_TAG = "MainActivity";
     private ArticleAdapter frontend;
+    private String lastSectionLoaded = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String section = sharedPrefs.getString(
                 getString(R.string.settings_section_key),
                 getString(R.string.settings_section_default));
+        lastSectionLoaded = section;
         Log.i(LOG_TAG, "Creating new Loader for section " + section);
         return new NewsLoader(this, section);
     }
@@ -116,6 +118,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onResume() {
         super.onResume();
+        String currentSection = PreferenceManager.getDefaultSharedPreferences(this).getString(
+            getString(R.string.settings_section_key),
+            getString(R.string.settings_section_default));
+        if (lastSectionLoaded.equals(currentSection)){
+            Log.i(LOG_TAG, "Skipping most of onResume");
+            return;
+        }
         ListView news_stand = (ListView) findViewById(R.id.news_list);
         frontend.clear();
         TextView too_bad = (TextView) findViewById(R.id.empty_list_text);
