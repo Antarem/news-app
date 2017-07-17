@@ -1,6 +1,5 @@
 package com.example.marie.newsapp;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -27,128 +26,57 @@ public class NewsQueryUtils {
     final private static String LOG_TAG = "NewsQueryUtils";
     final private static String GUARDIAN_URL = "https://content.guardianapis.com/search?&section=INPUT&show-fields=lastModified&show-tags=contributor&api-key=test";
 
-    static private JSONObject processJSON_getData(String request_data) {
+    static private JSONObject loadNewJSONObject(String request_data, String outputId) {
         JSONObject output;
         try {
             output = new JSONObject(request_data);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONObject data from String request_data failed", e);
+            Log.e(LOG_TAG, "Loading new JSONObject " + outputId + " failed", e);
             return null;
         }
         return output;
     }
 
-    static private JSONObject processJSON_getResponse(JSONObject data) {
+    static private JSONObject getJSONObjectFromJSONObject(JSONObject source, String key, String outputId) {
         JSONObject output;
         try {
-            output = data.getJSONObject("response");
+            output = source.getJSONObject(key);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONObject response from JSONObject data failed", e);
+            Log.e(LOG_TAG, "Loading JSONObject " + outputId + " failed", e);
             return null;
         }
         return output;
     }
 
-    static private JSONArray processJSON_getResults(JSONObject response) {
+    static private JSONArray getJSONArrayFromJSONObject(JSONObject source, String key, String outputId) {
         JSONArray output;
         try {
-            output = response.getJSONArray("results");
+            output = source.getJSONArray(key);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONArray results from JSONObject response failed", e);
+            Log.e(LOG_TAG, "Loading JSONArray " + outputId + " failed", e);
             return null;
         }
         return output;
     }
 
-    static private JSONObject processJSON_getResultElement(JSONArray results, int i) {
+    static private JSONObject getJSONObjectFromJSONArray(JSONArray source, int index, String outputId) {
         JSONObject output;
         try {
-            output = results.getJSONObject(i);
+            output = source.getJSONObject(index);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONObject Element #"+ String.valueOf(i) +" from JSONArray results failed", e);
+            Log.e(LOG_TAG, "Loading JSONObject " + outputId + " failed", e);
             return null;
         }
         return output;
     }
 
-    @NonNull
-    static private String processJSON_getResultElementTitle(JSONObject results, int i) {
+    static private String getStringFromJSONObject(JSONObject source, String key, String failsafe, String outputId) {
         String output;
         try {
-            output = results.getString("webTitle");
+            output = source.getString(key);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading String title from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return "Title not found";
-        }
-        return output;
-    }
-
-    @NonNull
-    static private String processJSON_getResultElementSection(JSONObject results, int i) {
-        String output;
-        try {
-            output = results.getString("sectionName");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading String section from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return "Section not found";
-        }
-        return output;
-    }
-
-    @NonNull
-    static private String processJSON_getResultElementReleased(JSONObject results, int i) {
-        String output;
-        try {
-            output = results.getString("webPublicationDate");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading String released from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return "Release date not found";
-        }
-        return output;
-    }
-
-    @NonNull
-    static private String processJSON_getResultElementUrl(JSONObject results, int i) {
-        String output;
-        try {
-            output = results.getString("webUrl");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading String url from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return "http://www.google.com";
-        }
-        return output;
-    }
-
-    static private JSONArray processJSON_getResultElementTags(JSONObject results, int i) {
-        JSONArray output;
-        try {
-            output = results.getJSONArray("tags");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONArray tags from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return null;
-        }
-        return output;
-    }
-
-    static private JSONObject processJSON_getResultElementTag(JSONArray tags, int i, int j) {
-        JSONObject output;
-        try {
-            output = tags.getJSONObject(j);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading JSONObject Tag #"+ String.valueOf(j) +" from JSONArray tags from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return null;
-        }
-        return output;
-    }
-
-    @NonNull
-    static private String processJSON_getResultElementTagContributorName(JSONObject tag, int i, int j) {
-        String output;
-        try {
-            output = tag.getString("webTitle");
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Loading String addition from JSONObject Tag #"+ String.valueOf(j) +" from JSONArray tags from JSONObject Element #"+ String.valueOf(i) +" failed", e);
-            return "Unknown Name";
+            Log.e(LOG_TAG, "Loading String " + outputId + " failed", e);
+            return failsafe;
         }
         return output;
     }
@@ -157,20 +85,20 @@ public class NewsQueryUtils {
     static private ArrayList<Article> processJSON(String request_data) {
         ArrayList<Article> output = new ArrayList<Article>();
 
-        JSONObject data = processJSON_getData(request_data);
+        JSONObject data = loadNewJSONObject(request_data, "data");
         if (data == null)
             return null;
 
-        JSONObject response = processJSON_getResponse(data);
+        JSONObject response = getJSONObjectFromJSONObject(data, "response", "response");
         if (response == null)
             return null;
 
-        JSONArray results = processJSON_getResults(response);
+        JSONArray results = getJSONArrayFromJSONObject(response, "results", "results");
         if (results == null)
             return null;
 
         for(int i = 0; i < results.length(); i++) {
-            JSONObject element = processJSON_getResultElement(results, i);
+            JSONObject element = getJSONObjectFromJSONArray(results, i, "element #" + String.valueOf(i));
             String new_title, new_section, new_released, new_url, new_author;
             if (element == null) {
                 Article unloaded_article = new Article("Failed to load article data", "Error",
@@ -178,25 +106,27 @@ public class NewsQueryUtils {
                 output.add(unloaded_article);
                 continue;
             }
-            new_title = processJSON_getResultElementTitle(element, i);
-            new_section = processJSON_getResultElementSection(element, i);
-            new_released = processJSON_getResultElementReleased(element, i); // assuming query has "&show-fields=lastModified"
+            new_title = getStringFromJSONObject(element, "webTitle", "Title not found", "title from element #" + String.valueOf(i));
+            new_section = getStringFromJSONObject(element, "sectionName", "Section not found", "section from element #" + String.valueOf(i));
+            new_released = getStringFromJSONObject(element, "webPublicationDate", "Publish date not found", "released from element #" + String.valueOf(i));
             String[] time = new_released.split("T");
             new_released = time[1].substring(0, time[1].length()-1) + ", " + time[0];
             // assuming the format of published date is YYYY-MM-DDTHH:MM:SSZ
-            new_url = processJSON_getResultElementUrl(element, i);
+            new_url = getStringFromJSONObject(element, "webUrl", "http://www.google.com", "url from element #" + String.valueOf(i));
 
-            JSONArray tags = processJSON_getResultElementTags(element, i);
+            JSONArray tags = getJSONArrayFromJSONObject(element, "tags", "tags from element #" + String.valueOf(i));
             if(tags == null) { // assuming the query was done with "&show-tags=contributor"
                 new_author = "The Guardian";
             }
             else {
                 new_author = "";
                 for (int j = 0; j < tags.length(); j++){ // should skip the loop should the tags be empty
-                    JSONObject tag = processJSON_getResultElementTag(tags, i, j);
+                    JSONObject tag = getJSONObjectFromJSONArray(tags, j, "tag #" + String.valueOf(j) +
+                            " from element #" + String.valueOf(i));
                     if (tag == null)
-                        new_author = new_author + "Unknown Tag";
-                    else new_author = new_author + processJSON_getResultElementTagContributorName(tag, i, j);
+                        new_author = new_author + "Tag not found";
+                    else new_author = new_author + getStringFromJSONObject(tag, "webTitle", "Author not found",
+                            "author from tag #" + String.valueOf(j) + " from element #" + String.valueOf(i));
                     new_author = new_author + ", ";
                 }
                 if(new_author.length() > 2)
